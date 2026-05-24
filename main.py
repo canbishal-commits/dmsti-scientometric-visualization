@@ -1,23 +1,51 @@
-import requests
-from bs4 import BeautifulSoup
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
 
-url = "https://elaba.mb.vu.lt/dmsti/?aut=Martynas+Sabaliauskas"
+# Read researcher names
+with open("researchers.txt", "r", encoding="utf-8") as file:
+    researchers = [line.strip() for line in file.readlines()]
 
-response = requests.get(url)
+# Number of researchers
+n = len(researchers)
 
-soup = BeautifulSoup(response.text, "html.parser")
+# Create random collaboration matrix
+np.random.seed(42)
 
-text = soup.get_text()
+matrix = np.random.randint(0, 6, size=(n, n))
 
-lines = text.splitlines()
+# Make matrix symmetric
+matrix = (matrix + matrix.T) // 2
 
-clean_lines = []
+# Set diagonal to 0
+np.fill_diagonal(matrix, 0)
 
-for line in lines:
-    line = line.strip()
+# Convert collaboration matrix to dissimilarity matrix
+dissimilarity_matrix = 1 / (matrix + 1)
 
-    if len(line) > 50:
-        clean_lines.append(line)
+# Apply PCA
+pca = PCA(n_components=2)
 
-for item in clean_lines[:20]:
-    print(item)
+coordinates = pca.fit_transform(dissimilarity_matrix)
+
+# Plot
+plt.figure(figsize=(12, 8))
+
+for i, researcher in enumerate(researchers):
+
+    x = coordinates[i, 0]
+    y = coordinates[i, 1]
+
+    plt.scatter(x, y)
+
+    plt.text(x, y, researcher, fontsize=8)
+
+plt.title("DMSTI Researcher Visualization using PCA")
+
+plt.xlabel("PCA Component 1")
+plt.ylabel("PCA Component 2")
+
+plt.grid(True)
+
+plt.show()
