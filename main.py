@@ -30,6 +30,19 @@ pca = PCA(n_components=2)
 
 coordinates = pca.fit_transform(dissimilarity_matrix)
 
+# Convert full name to initials
+def get_initials(name):
+
+    parts = name.split()
+
+    initials = ""
+
+    for part in parts:
+        initials += part[0].upper()
+
+    return initials
+
+
 # Plot
 plt.figure(figsize=(12, 8))
 
@@ -40,7 +53,8 @@ for i, researcher in enumerate(researchers):
 
     plt.scatter(x, y)
 
-    plt.text(x, y, researcher, fontsize=8)
+
+    plt.text(x, y, get_initials(researcher), fontsize=8)
 
 plt.title("DMSTI Researcher Visualization using PCA")
 
@@ -62,7 +76,7 @@ mds = MDS(
     n_init=4
 )
 
-mds_coordinates = mds.fit_transform(dissimilarity_matrix)
+mds_coordinates = mds.fit_transform(matrix)
 
 # Plot MDS visualization
 plt.figure(figsize=(12, 8))
@@ -74,7 +88,8 @@ for i, researcher in enumerate(researchers):
 
     plt.scatter(x, y)
 
-    plt.text(x, y, researcher, fontsize=8)
+   
+    plt.text(x, y, get_initials(researcher), fontsize=8)
 
 plt.title("DMSTI Researcher Visualization using SMACOF / MDS")
 
